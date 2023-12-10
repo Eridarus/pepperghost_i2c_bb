@@ -39,6 +39,7 @@ uint8_t send_8b(uint8_t data){
 }
 
 uint8_t rcv_8b(uint8_t final_bit){
+  SDA_HIGH
   uint8_t rx=0;
   for(uint8_t i=0; i<8; i++){
     do {
