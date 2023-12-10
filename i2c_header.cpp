@@ -11,8 +11,8 @@
 #define SCL_HIGH pinMode(I2C_SCL_PIN, INPUT); DLY
 #define SCL_LOW pinMode(I2C_SCL_PIN, OUTPUT); DLY
 
-#define ADDR_W(A) ((A << 1) & 0xfe)
-#define ADDR_R(A) ((A << 1) | 0x01)
+#define ADDR_W(A) (((A) << 1) & 0xfe)
+#define ADDR_R(A) (((A) << 1) | 0x01)
 
 #define SET_ACK SDA_LOW
 #define SET_NACK SDA_HIGH
@@ -21,9 +21,12 @@
 
 #define START_COND SDA_LOW SCL_LOW
 #define STOP_COND SCL_LOW SDA_LOW SDA_HIGH SCL_HIGH
+#define START_REPEAT SDA_HIGH DLY SCL_HIGH
 
 #define PULSE_SCL SCL_HIGH DLY SCL_LOW
 
+//EXPECTS SCL LOW, SDA DON'T CARE
+//LEAVES SCL LOW, SDA NOT PULLED
 uint8_t send_8b(uint8_t data){
   for(uint8_t i=8; i>=1; i--){
     SDA_WRITE(0x01&(data >> (i-1)))
@@ -38,20 +41,21 @@ uint8_t send_8b(uint8_t data){
   return ack;
 }
 
+//EXPECTS SCL LOW, SDA DON'T CARE
+//LEAVES SCL LOW, SDA NOT PULLED
 uint8_t rcv_8b(uint8_t final_bit){
   SDA_HIGH
   uint8_t rx=0;
   for(uint8_t i=0; i<8; i++){
+    rx <<=1;
     do {
       SCL_HIGH
-    }while(digitalRead(I2C_SCL_PIN)==0); //clock stretching
-    rx <<=1;
-    rx = rx & (digitalRead(I2C_SDA_PIN) & 0x01);
-    SCL_LOW
+    }while(digitalRead(I2C_SCL_PIN)==LOW); //clock stretching
+    rx |= (digitalRead(I2C_SDA_PIN) & 0x01);
     DLY
+    SCL_LOW
   }
-  
-  if(final_bit == 0) {SET_NACK} else {SET_ACK} //SET ACK
+  if(final_bit == 0x00) {SET_NACK} else {SET_ACK} //SET ACK
   SCL_HIGH
   DLY
   SCL_LOW
