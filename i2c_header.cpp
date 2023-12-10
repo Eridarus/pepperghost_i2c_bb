@@ -66,11 +66,14 @@ uint8_t rcv_8b(uint8_t final_bit){
 void receiveBytesRead(uint8_t addr, uint8_t *buff, uint8_t num_bytes){
   START_COND
   uint8_t ack = send_8b(ADDR_R(addr));
-  uint8_t i = 0;
-  while(i < num_bytes && ack==0){
-    buff[i] = rcv_8b( i==(num_bytes-1) ? 0x01 : 0x00);
-    i++;
+  if(ack != 0){
+    STOP_COND
+    return;
   }
+  for(uint8_t i=0; i<num_bytes; i++){
+    buff[i] = rcv_8b( i==(num_bytes-1) ? 0x00 : 0x01);
+  }
+  STOP_COND
 }
 
 void sendBytesWrite(uint8_t addr, uint8_t *data, uint8_t num_bytes){
