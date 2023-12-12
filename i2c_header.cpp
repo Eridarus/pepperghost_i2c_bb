@@ -21,7 +21,7 @@
 
 #define START_COND SDA_LOW SCL_LOW
 #define STOP_COND SCL_LOW SDA_LOW SDA_HIGH SCL_HIGH
-#define START_REPEAT SDA_HIGH DLY SCL_HIGH
+#define START_REPEAT SDA_LOW DLY SDA_HIGH DLY SCL_HIGH
 
 #define PULSE_SCL SCL_HIGH DLY SCL_LOW
 
@@ -43,7 +43,7 @@ uint8_t send_8b(uint8_t data){
 
 //EXPECTS SCL LOW, SDA DON'T CARE
 //LEAVES SCL LOW, SDA NOT PULLED
-uint8_t rcv_8b(uint8_t final_bit){
+uint8_t rcv_8b(uint8_t send_ack){
   SDA_HIGH
   uint8_t rx=0;
   for(uint8_t i=0; i<8; i++){
@@ -55,7 +55,7 @@ uint8_t rcv_8b(uint8_t final_bit){
     DLY
     SCL_LOW
   }
-  if(final_bit == 0x00) {SET_NACK} else {SET_ACK} //SET ACK
+  if(send_ack == 0x00) {SET_NACK} else {SET_ACK} //SET ACK
   SCL_HIGH
   DLY
   SCL_LOW
