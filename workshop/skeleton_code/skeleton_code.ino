@@ -1,3 +1,5 @@
+//HEADER FILE TO COPY/PASTE FOR I2C BITBANG
+
 #define I2C_SCL_PIN 2
 #define I2C_SDA_PIN 0
 
@@ -9,21 +11,21 @@
 #define SCL_HIGH pinMode(I2C_SCL_PIN, INPUT); DLY
 #define SCL_LOW pinMode(I2C_SCL_PIN, OUTPUT); DLY
 
-#define ADDR_W(A) ((A << 1) & 0xfe)
-#define ADDR_R(A) ((A << 1) | 0x01)
+#define ADDR_W(A) (((A) << 1) & 0xfe)
+#define ADDR_R(A) (((A) << 1) | 0x01)
 
 #define SET_ACK SDA_LOW
 #define SET_NACK SDA_HIGH
 
 #define SDA_WRITE(x) ((x) > 0 ? ({SDA_HIGH}) : ({SDA_LOW}));
 
-#define START_COND SDA_LOW SCL_LOW
-#define STOP_COND SCL_LOW SDA_LOW SDA_HIGH SCL_HIGH
+#define START_COND SDA_LOW DLY SCL_LOW
+#define STOP_COND SCL_LOW SDA_LOW DLY SCL_HIGH DLY SDA_HIGH
+#define START_REPEAT SDA_LOW DLY SDA_HIGH DLY SCL_HIGH
 
 #define PULSE_SCL SCL_HIGH DLY SCL_LOW
 
 #define NUM_DISP_BYTES (128*8)
-#include <stdint.h>
 
 #define WIDTH 128
 #define HEIGHT 64
